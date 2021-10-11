@@ -12,6 +12,28 @@ export const AppStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLOR_BACKGROUND,
   },
+  description_container: {
+    flex: 1,
+    justifyContent: "space-evenly"
+  },
+  card_container: {
+
+    flexDirection: "row",
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 3.84,
+    elevation: 3,
+  },
+  text_input: {
+    backgroundColor: "white",
+  },
   h1: {
     fontSize: 32,
   },
@@ -24,4 +46,7 @@ export const AppStyles = StyleSheet.create({
   body: {
     fontSize: 14,
   },
+  top_padding: {
+    paddingTop: 10
+  }
 });

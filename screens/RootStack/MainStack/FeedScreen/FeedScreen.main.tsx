@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, TouchableOpacity, Text } from "react-native";
 import { Appbar, Card } from "react-native-paper";
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -26,6 +26,7 @@ interface Props {
 
 export default function FeedScreen({ navigation }: Props) {
   // TODO: Initialize a list of SocialModel objects in state.
+  const [socialModelsList, setSocialModelsList] = useState<SocialModel[]>([]);
 
   /* TYPESCRIPT HINT: 
     When we call useState(), we can define the type of the state
@@ -46,24 +47,63 @@ export default function FeedScreen({ navigation }: Props) {
       4. It's probably wise to make sure you can create new socials before trying to 
           load socials on this screen.
   */
+  useEffect(()=>{
+    let unsubscribe = firebase.firestore().collection("socials").onSnapshot((querySnapshot) => {
+      console.log("Received Data")
+      let events : SocialModel[] = [];
+      let count = 0
+      querySnapshot.forEach((doc) => {
+          events.push({...doc.data(), id: count});
+          count += 1
+      })
+      events.sort(function(a,b) {return new Date(b.eventDate) - new Date(a.eventDate)})
+      setSocialModelsList(events)
+    })
+    return unsubscribe
+  }, [])
 
   const renderItem = ({ item }: { item: SocialModel }) => {
     // TODO: Return a Card corresponding to the social object passed in
     // to this function. On tapping this card, navigate to DetailScreen
     // and pass this social.
+    return (
+      <Card 
+        style={styles.card_container}
+        onPress={() => {navigation.navigate("DetailScreen", {"social": item})}}
+      >
+        <Card.Cover source={{ uri: item.eventImage }}/>
+        <Card.Title
+          title={item.eventName}
+          subtitle={item.eventLocation + " · " + new Date(item.eventDate).toLocaleString()}
 
-    return null;
+        />
+      </Card>
+
+        
+    )
+
   };
 
   const NavigationBar = () => {
-    // TODO: Return an AppBar, with a title & a Plus Action Item that goes to the NewSocialScreen.
-    return null;
+    // TODO (+): Return an AppBar, with a title & a Plus Action Item that goes to the NewSocialScreen.
+    return (
+      <Appbar.Header dark={false} style={{backgroundColor: "white"}}>
+        <Appbar.Content title="Socials"/>
+        <Appbar.Action icon="plus" onPress={() => {console.log("Going to social screen"); navigation.navigate("NewSocialScreen")}} />
+      </Appbar.Header>
+    )
   };
 
   return (
     <>
-      {/* Embed your NavigationBar here. */}
+      <NavigationBar />
       <View style={styles.container}>
+        <FlatList 
+          data={socialModelsList}
+          renderItem={renderItem}
+          keyExtractor={(item) => {item}}
+          
+        />
         {/* Return a FlatList here. You'll need to use your renderItem method. */}
       </View>
     </>
